@@ -264,6 +264,4 @@ return {
 	{ "stevearc/dressing.nvim", opts = {} },
 
 	{ "kyazdani42/nvim-web-devicons", config = true },
-
-	{ "tpope/vim-fugitive", config = true },
 }
