@@ -75,40 +75,40 @@ The following are some of the most important keybindings, all using the <leader>
 
 ### General
 
-| Keybinding            | Description                                    |
-| --------------------- | ---------------------------------------------- |
-| <C-s>                 | Save File                                      |
-| <leader>h             | Clear search highlight                         |
-| <leader>q / <leader>Q | Close window / Close all windows               |
-| <leader>w             | Git write and add (:Gw)                        |
-| <M-5>                 | Run Python file (:w<CR>:terminal python %<CR>) |
+| Keybinding                | Description                                    |
+| ------------------------- | ---------------------------------------------- |
+| `<C-s>`                   | Save File                                      |
+| `<leader>h`               | Clear search highlight                         |
+| `<leader>q` / `<leader>Q` | Close window / Close all windows               |
+| `<leader>w`               | Git write and add (:Gw)                        |
+| `<M-5>`                   | Run Python file (:w<CR>:terminal python %<CR>) |
 
 ### Files and Buffers
 
-| Keybinding            | Description                                         |
-| --------------------- | --------------------------------------------------- |
-| <leader>e             | Toggle Neo-tree (File Explorer) in a float window   |
-| <leader>l             | Toggle Neo-tree (File Explorer) on the left sidebar |
-| <leader>ff            | Telescope Find Files                                |
-| <leader>fg            | Telescope Live Grep (Search contents)               |
-| <leader>n / <leader>p | Next / Previous buffer                              |
-| <leader>c             | Close current buffer                                |
+| Keybinding                | Description                                         |
+| ------------------------- | --------------------------------------------------- |
+| `<leader>e`               | Toggle Neo-tree (File Explorer) in a float window   |
+| `<leader>l`               | Toggle Neo-tree (File Explorer) on the left sidebar |
+| `<leader>ff`              | Telescope Find Files                                |
+| `<leader>fg`              | Telescope Live Grep (Search contents)               |
+| `<leader>n` / `<leader>p` | Next / Previous buffer                              |
+| `<leader>c`               | Close current buffer                                |
 
 ### LSP and Diagnostics
 
-| Keybinding  | Description                                     |
-| ----------- | ----------------------------------------------- |
-| `[d` / `]d` | Jump to previous / next diagnostic              |
-| <leader>d   | Show diagnostic details (float window)          |
-| <leader>xx  | Toggle Trouble diagnostics (for all files)      |
-| <leader>xX  | Toggle Trouble diagnostics (for current buffer) |
+| Keybinding   | Description                                     |
+| ------------ | ----------------------------------------------- |
+| `[d` / `]d`  | Jump to previous / next diagnostic              |
+| `<leader>d`  | Show diagnostic details (float window)          |
+| `<leader>xx` | Toggle Trouble diagnostics (for all files)      |
+| `<leader>xX` | Toggle Trouble diagnostics (for current buffer) |
 
 ### Splits and Tabs
 
-| Keybinding              | Description             |
-| ----------------------- | ----------------------- |
-| <leader>sp              | Horizontal split (:new) |
-| <leader>vs              | Vertical split (:vnew)  |
-| <leader>t               | Open new tab            |
-| <leader>tn / <leader>tp | Next / Previous tab     |
-| <leader>tc              | Close current tab       |
+| Keybinding                  | Description             |
+| --------------------------- | ----------------------- |
+| `<leader>sp`                | Horizontal split (:new) |
+| `<leader>vs`                | Vertical split (:vnew)  |
+| `<leader>t`                 | Open new tab            |
+| `<leader>tn` / `<leader>tp` | Next / Previous tab     |
+| `<leader>tc`                | Close current tab       |
