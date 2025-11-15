@@ -52,7 +52,7 @@ return {
 				markdown = { "prettier" },
 			},
 			format_on_save = {
-				-- timeout_ms = 500,
+				timeout_ms = 5000,
 				lsp_fallback = true,
 			},
 		},
@@ -178,7 +178,7 @@ return {
 		map('n', 'gd', '<Cmd>Lspsaga lsp_finder<CR>', opts)
 		map('n', 'gD', '<Cmd>Lspsaga peek_definition<CR>', opts)
 		map('n', '<leader>rn', '<Cmd>Lspsaga rename<CR>', opts)
-		map('n', '<leader>ca', '<Cmd>Lspsaga code_action<CR>', opts)
+		map('n', '<leader>a', '<Cmd>Lspsaga code_action<CR>', opts)
 		map('n', '[d', '<Cmd>Lspsaga diagnostic_jump_prev<CR>', opts)
 		map('n', ']d', '<Cmd>Lspsaga diagnostic_jump_next<CR>', opts)
 		-- For jumping inside a floating window (if it is focused)
