@@ -17,7 +17,7 @@ All configuration is written in Lua and follows a modular structure:
 | Category        | Key Plugins                                                          | Description                                                                    |
 | --------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Plugin Manager  | lazy.nvim                                                            | Modern, performant plugin manager.                                             |
-| Theme           | folke/tokyonight.nvim                                                | Clean, dark theme using the tokyonight-storm style.                            |
+| Theme           | folke/tokyonight.nvim, projekt0n/github-nvim-theme                   | Clean, dark theme using the tokyonight-storm style.                            |
 | UI/UX           | nvim-lualine/lualine.nvim, akinsho/bufferline.nvim, folke/noice.nvim | Custom statusline, buffer tabs, and a cleaner command-line/message UI.         |
 | File Explorer   | nvim-tree/neo-tree.nvim                                              | A powerful file explorer (mapped to <leader>e and <leader>l).                  |
 | LSP & Tools     | mason.nvim, mason-lspconfig.nvim, nvim-treesitter                    | Seamless LSP server installation/management, and accurate syntax highlighting. |
