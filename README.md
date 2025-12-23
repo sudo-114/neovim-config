@@ -11,6 +11,23 @@ All configuration is written in Lua and follows a modular structure:
 | core/options.lua | Sets up vim.opt values (tab stops, line numbers, clipboard). |
 | core/keymaps.lua | Defines all custom keybindings. |
 | plugins/\*.lua | Contains specifications and configuration for all installed plugins. |
+|serve | The "Swiss Army Knife" utility script for auto-detecting and launching dev servers with optional tunneling |
+
+## 🛠️ Utility Script: Serve
+
+Included in this setup is a custom serve script—a "Swiss Army Knife" for web development. It detects your project type and starts the appropriate server instantly.
+
+### Features
+
+- Auto-detection: Works with Node.js (npm/pnpm/yarn/bun), PHP, and Static HTML (Python).
+- Public Tunneling: Generate a public URL and QR code for mobile testing with --public.
+- LAN Access: Displays your local network IP for Wi-Fi testing.
+
+### Installation
+
+- To use serve from anywhere in your terminal:
+- Run ./serve --install.
+- Restart your terminal or run source ~/.bashrc (or ~/.zshrc).
 
 ## ✨ Features
 
