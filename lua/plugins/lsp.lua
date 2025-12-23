@@ -28,6 +28,7 @@ return {
 				"lua_ls", -- for Lua
 				"tailwindcss", -- for Tailwindcss
 				"somesass_ls", -- for SCSS
+				"bashls", -- for Bash
 			}
 
 			require("mason-lspconfig").setup({
@@ -118,6 +119,7 @@ return {
 					"markdown",
 					"markdown_inline",
 					"scss",
+					"bash",
 				},
 				highlight = { enable = true },
 				indent = { enable = true },

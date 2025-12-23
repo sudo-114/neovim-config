@@ -34,7 +34,7 @@ map("t", "<Esc>", "<C-\\><C-n>", { desc = "Escape active terminal" })
 -- Running code/servers
 map("n", "<M-b>", ":terminal ~/build.sh %<CR>", { silent = true, desc = "Compile/run C++ file" })
 map("n", "<M-5>", ":w<CR>:terminal python %<CR>", { silent = true, desc = "Run python file" })
-map("n", "<M-l>", ":terminal ~/server.sh<CR>", { silent = true, desc = "Deploy local server in $HOME/webdoc/" })
+map("n", "<M-l>", ":terminal serve --public<CR>", { silent = true, desc = "Deploy local server in $HOME/webdoc/" })
 map("n", "<C-l>", ":terminal python3 -m http.server<CR>", { silent = true, desc = "Deploy local server here" })
 
 -- Others
