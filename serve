@@ -20,10 +20,10 @@ RESET='\033[0m'
 # --- CLEANUP ---
 cleanup() {
     # Kill all background jobs (the tunnel)
-    kill $(jobs -p) 2>/dev/null || true
+    pkill -P $$ 2>/dev/null
     rm -f "$TUNNEL_LOG"
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM HUP QUIT
 
 # --- LOGO ---
 logo() {
@@ -39,22 +39,19 @@ EOF
     echo -e "${RESET}"
 }
 
-logo
-
 # --- GLOBAL INSTALLER ---
 # This allows 'serve --install' to work from anywhere
 install_globally() {
     local target="$PREFIX/bin/serve"
     local source
     source=$(realpath "$0")
+    local shell=$(basename "$SHELL")
 
     echo -e "🔗 Linking ${BOLD}'$source'${RESET} to ${BOLD}'$target'${RESET}...\n"
     ln -sf "$source" "$target"
     chmod +x "$target"
 
     local runner='alias serve=". $PREFIX/bin/serve"'
-
-    local shell=$(basename "$SHELL")
 
     if [ "$shell" = "bash" ]; then
         local shell_conf="bashrc"
@@ -64,9 +61,7 @@ install_globally() {
         local shell_conf="bashrc" # fallback
     fi
 
-    if [ ! -f ~/.$shell_conf ]; then
-        touch ~/.$shell_conf
-    fi
+    [ ! -f ~/.$shell_conf ] && touch ~/.$shell_conf
 
     if ! grep -q "$runner" ~/.$shell_conf; then
         echo "$runner" >>~/.$shell_conf
@@ -78,7 +73,7 @@ install_globally() {
 
 # --- HELP MENU ---
 show_help() {
-    echo "SERVE v1.0"
+    echo "SERVE v1.1"
     echo "Usage: serve [path] [options]"
     echo
     echo "Options:"
@@ -98,25 +93,18 @@ check_dep() {
         echo -e "⚠️Dependency missing: $cmd_name is not installed.\n"
 
         # Map command names to actual package names
-        if [[ "$cmd_name" == "node" ]]; then
-            pkg_name="nodejs"
-        fi
+        [[ "$cmd_name" == "node" ]] && pkg_name="nodejs"
 
         local install_cmd="sudo apt install $pkg_name -y"
-        if [[ -n "$TERMUX_VERSION" ]]; then
-            install_cmd="pkg install $pkg_name -y"
-        fi
+        [[ -n "$TERMUX_VERSION" ]] && install_cmd="pkg install $pkg_name -y"
 
         echo "👉 Press [Enter] to run '$install_cmd' or [q] to quit: "
         read -r choice
 
-        if [[ -z "$choice" ]]; then
-            echo -e "\nRunning install...\n"
-            eval "$install_cmd"
-        else
-            echo -e "${RED}❌ Cannot continue without $cmd_name. Exiting.${RESET}"
-            exit 1
-        fi
+        [[ -n "$choice" ]] && echo -e "${RED}❌ Cannot continue without $cmd_name. Exiting.${RESET}" && exit 1
+
+        echo -e "\nRunning install...\n"
+        eval "$install_cmd"
     fi
 }
 
@@ -158,37 +146,60 @@ silent_install() {
     fi
 }
 
+# --- TUNNEL ENGINE ---
+get_tunnel_url() {
+    # Check for internet before trying
+    while ! ping -c 1 google.com &>/dev/null; do
+        echo -e "${YELLOW}Waiting for internet connection...${RESET}" >/dev/tty
+        sleep 5
+    done
+
+    : >"$TUNNEL_LOG"
+    while [ ! -s "$TUNNEL_LOG" ]; do
+        ssh -n -R 80:localhost:"$PORT" -o StrictHostKeyChecking=no -o ServerAliveInterval=60 nokey@localhost.run >"$TUNNEL_LOG" 2>&1 &
+        sleep 2
+    done
+
+    PUBLIC_URL=""
+    while [ -z "$PUBLIC_URL" ]; do
+        echo "🌐 Waiting for tunnel url..."
+        sleep 2
+        PUBLIC_URL=$(grep -o 'https://[^ ]*\.lhr.life' "$TUNNEL_LOG" | head -n 1)
+    done
+}
+
 # --- PUBLIC TUNNEL ENGINE ---
 start_public_tunnel() {
     # Ensure they have SSH and QR tools
     silent_install "ssh"
 
-    if [[ -n $TERMUX_VERSION ]]; then
-        silent_install "libqrencode"
-    fi
+    [[ -n $TERMUX_VERSION ]] && silent_install "libqrencode"
     silent_install "qrencode"
-
-    echo
-
-    if [[ ! -f ~/.ssh/id_ed25519 ]]; then
-        echo -e "🔑 No SSH key found. Generating..."
-        mkdir -p ~/.ssh
-        ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519 <<<y >/dev/null 2>&1
-    fi
-
-    echo "🌐 Generating public link via localhost.run..."
 
     if [[ ! -f "$TUNNEL_LOG" ]]; then
         touch "$TUNNEL_LOG"
     fi
 
-    # Start the tunnel in the background
-    # We use a temp file to capture the assigned URL
-    # We use -o StrictHostKeyChecking=no so it doesn't hang asking 'Are you sure?'
-    ssh -n -R 80:localhost:"$PORT" -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=3 localhost.run >"$TUNNEL_LOG" 2>&1 &
+    echo -e "\n🔄 ${DIM}Initializing tunnel...${RESET}"
+    get_tunnel_url
 
-    sleep 3
-    PUBLIC_URL=$(grep -o 'https://[^ ]*\.lhr.life' "$TUNNEL_LOG" | head -n 1)
+    (
+        while true; do
+            URL=$(grep -o 'https://[^ ]*\.lhr.life' "$TUNNEL_LOG" | tail -n 1)
+            if [ "$URL" != "$PUBLIC_URL" ] && [ -n "$URL" ]; then
+                PUBLIC_URL="$URL"
+                echo -e "\n🌐 ${BOLD}New tunnel URL:${RESET} ${BLUE}$URL${RESET}\n" >/dev/tty
+            fi
+
+            if tail "$TUNNEL_LOG" | grep -Eqi 'disconnect|closed|broken'; then
+                echo -e "\n⚠️ ${BOLD}Tunnel disconnected/closed${RESET} at $(date)" >/dev/tty
+                echo -e "🔄 Restarting tunnel...\n" >/dev/tty
+                get_tunnel_url
+                echo -e "\n🌐 ${BOLD}New tunnel URL:${RESET} ${BLUE}$PUBLIC_URL${RESET}\n" >/dev/tty
+            fi
+            sleep 2
+        done
+    ) &
 
     echo
 }
@@ -214,7 +225,7 @@ render_ui() {
     fi
 
     if [[ "$PUBLIC_MODE" == "true" && ! -n "$PUBLIC_URL" ]]; then
-        echo -e "\n${RED}❌ Tunnel failed. Check your internet connection.${RESET}"
+        echo -e "\n${RED}❌ Tunnel unreachable. Check your internet connection.${RESET}"
     fi
 
     echo -e "\n${DIM}Press Ctrl+C to stop${RESET}\n"
@@ -287,9 +298,7 @@ else
 fi
 
 # --- START TUNNELING ---
-if [[ "$PUBLIC_MODE" == "true" ]]; then
-    start_public_tunnel
-fi
+[[ "$PUBLIC_MODE" == "true" ]] && start_public_tunnel
 
 sleep 1
 render_ui
